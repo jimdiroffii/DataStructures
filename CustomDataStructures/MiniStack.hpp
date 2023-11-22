@@ -1,16 +1,16 @@
 /***
  * MiniStack
  *
- * A stack structure template class. 
- * 
- * The objective is to define a statically sized 
+ * A stack structure template class.
+ *
+ * The objective is to define a statically sized
  * stack, that models a full stack structure.
  */
 
 #pragma once
 #pragma warning(disable : 26455) // ignore default constructor noexcept
-#ifndef MINISTACK_H_
-#define MINISTACK_H_
+#ifndef MINISTACK_HPP_
+#define MINISTACK_HPP_
 
 #include <memory>    // unique_ptr, make_unique
 #include <stdexcept> // runtime_error
@@ -42,9 +42,9 @@ public:
 };
 
 template <typename T>
-MiniStack<T>::MiniStack(std::size_t len) : length{ len > 0 ? len : kStackSize },
-counter{ 0 },
-elements{ std::make_unique<T[]>(this->length) } {}
+MiniStack<T>::MiniStack(std::size_t len) : length{len > 0 ? len : kStackSize},
+                                           counter{0},
+                                           elements{std::make_unique<T[]>(this->length)} {}
 
 template <typename T>
 bool MiniStack<T>::empty() const noexcept
@@ -91,4 +91,4 @@ void MiniStack<T>::pop()
   --counter;
 }
 
-#endif // MINISTACK_H_
+#endif // MINISTACK_HPP_

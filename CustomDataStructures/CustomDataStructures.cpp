@@ -11,25 +11,53 @@
 #include <stack>
 #include <cstdint>
 
-void stackTest();
-void miniStackTimed(const int iterations);
-void stackTimed(const int iterations);
+// void stackTest();
+
+void miniStackPushPops(const std::size_t iterations);
+void stackPushPops(const std::size_t iterations);
 
 int main()
 {
-  stackTest();
+  constexpr std::size_t kIter{1000000000};
+  std::chrono::nanoseconds elapsedTimeMiniStack{};
+  std::chrono::nanoseconds elapsedTimeStack{};
 
-  miniStackTimed(10000);
-  stackTimed(10000);
+  {
+    const auto startTime = std::chrono::high_resolution_clock::now();
+
+    miniStackPushPops(kIter);
+
+    const auto endTime = std::chrono::high_resolution_clock::now();
+    elapsedTimeMiniStack = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
+    std::cout << "miniStack | Elapsed Time: " << elapsedTimeMiniStack << '\n';
+  }
+
+  {
+    const auto startTime = std::chrono::high_resolution_clock::now();
+
+    stackPushPops(kIter);
+
+    const auto endTime = std::chrono::high_resolution_clock::now();
+    elapsedTimeStack = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
+    std::cout << "std::stack | Elapsed Time: " << elapsedTimeStack << '\n';
+  }
+
+  std::cout << "Difference: " << elapsedTimeStack - elapsedTimeMiniStack
+            << " | Ratio: " << elapsedTimeStack / elapsedTimeMiniStack << '\n';
+
+  {
+    // stackTest();
+  }
 }
 
+/*
 void stackTest()
 {
-  constexpr int n{10};
+  constexpr int n{ 10 };
 
   // Constructor test
   MiniStack<int> ministack_A{};
-  MiniStack<int> ministack_B{2};
+  MiniStack<int> ministack_B{ 2 };
 
   // Empty test
   std::cout << "Empty\n";
@@ -77,7 +105,7 @@ void stackTest()
       ++count;
     }
   }
-  catch (const std::runtime_error &e)
+  catch (const std::runtime_error& e)
   {
     std::cout << count << " : " << e.what() << '\n';
   }
@@ -90,7 +118,7 @@ void stackTest()
       --count;
     }
   }
-  catch (const std::runtime_error &e)
+  catch (const std::runtime_error& e)
   {
     std::cout << count << " : " << e.what() << '\n';
   }
@@ -99,59 +127,35 @@ void stackTest()
   {
     ministack_A.top();
   }
-  catch (const std::runtime_error &e)
+  catch (const std::runtime_error& e)
   {
     std::cout << count << " : " << e.what() << '\n';
   }
 }
+*/
 
-void miniStackTimed(const int iterations) {
-  /* PUSH + SIZE TEST */
-  const auto startTimePush = std::chrono::high_resolution_clock::now();
-
+void miniStackPushPops(const std::size_t iterations)
+{
   MiniStack<int> ministack(iterations);
-  for (int i = 0; ministack.size() < iterations; ++i) {
+  for (int i = 0; ministack.size() < iterations; ++i)
+  {
     ministack.push(i);
   }
-  
-  const auto endTimePush = std::chrono::high_resolution_clock::now();
-  auto elapsedTimePush = std::chrono::duration_cast<std::chrono::nanoseconds>(endTimePush - startTimePush);
-  std::cout << __func__ << " | PUSH Elapsed Time: " << elapsedTimePush << '\n';
-
-  /* POP + EMPTY TEST */
-  const auto startTimePop = std::chrono::high_resolution_clock::now();
-
-  for (int i = 0; !ministack.empty() ; ++i) {
+  for (int i = 0; !ministack.empty(); ++i)
+  {
     ministack.pop();
   }
-
-  const auto endTimePop = std::chrono::high_resolution_clock::now();
-  auto elapsedTimePop = std::chrono::duration_cast<std::chrono::nanoseconds>(endTimePop - startTimePop);
-  std::cout << __func__ << " | POP Elapsed Time: " << elapsedTimePop << '\n';
-
 }
 
-void stackTimed(const int iterations) {
-  /* PUSH + SIZE TEST */
-  const auto startTimePush = std::chrono::high_resolution_clock::now();
-
+void stackPushPops(const std::size_t iterations)
+{
   std::stack<int> stack;
-  for (int i = 0; stack.size() < iterations; ++i) {
+  for (int i = 0; stack.size() < iterations; ++i)
+  {
     stack.push(i);
   }
-
-  const auto endTimePush = std::chrono::high_resolution_clock::now();
-  auto elapsedTimePush = std::chrono::duration_cast<std::chrono::nanoseconds>(endTimePush - startTimePush);
-  std::cout << __func__ << " | PUSH Elapsed Time: " << elapsedTimePush << '\n';
-
-  /* POP + EMPTY TEST */
-  const auto startTimePop = std::chrono::high_resolution_clock::now();
-
-  for (int i = 0; !stack.empty(); ++i) {
+  for (int i = 0; !stack.empty(); ++i)
+  {
     stack.pop();
   }
-
-  const auto endTimePop = std::chrono::high_resolution_clock::now();
-  auto elapsedTimePop = std::chrono::duration_cast<std::chrono::nanoseconds>(endTimePop - startTimePop);
-  std::cout << __func__ << " | POP Elapsed Time: " << elapsedTimePop << '\n';
 }

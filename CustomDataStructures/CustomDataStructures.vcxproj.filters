@@ -23,5 +23,8 @@
     <ClInclude Include="MiniStack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MiniQueue.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
