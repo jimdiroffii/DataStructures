@@ -1,7 +1,10 @@
 /***
- * Stack
+ * MiniStack
  *
- * Stacks implement LIFO, last in first out.
+ * A stack structure template class. 
+ * 
+ * The objective is to define a statically sized 
+ * stack, that models a full stack structure.
  */
 
 #pragma once
@@ -10,7 +13,7 @@
 #define MINISTACK_H_
 
 #include <memory>    // unique_ptr, make_unique
-#include <stdexcept> // runtime_error, out_of_range
+#include <stdexcept> // runtime_error
 
 template <typename T>
 class MiniStack
@@ -39,9 +42,9 @@ public:
 };
 
 template <typename T>
-MiniStack<T>::MiniStack(std::size_t len) : length(len > 0 ? len : kStackSize),
-                                           counter(0),
-                                           elements(std::make_unique<T[]>(this->length)) {}
+MiniStack<T>::MiniStack(std::size_t len) : length{ len > 0 ? len : kStackSize },
+counter{ 0 },
+elements{ std::make_unique<T[]>(this->length) } {}
 
 template <typename T>
 bool MiniStack<T>::empty() const noexcept
@@ -60,7 +63,7 @@ void MiniStack<T>::push(const T &t)
 {
   if (counter >= length)
   {
-    throw std::runtime_error("Stack overflow");
+    throw std::runtime_error("Stack overflow in `push`");
   }
 
   elements[counter++] = t;
@@ -71,7 +74,7 @@ T &MiniStack<T>::top() const
 {
   if (empty())
   {
-    throw std::runtime_error("Stack underflow");
+    throw std::runtime_error("Stack underflow in `top`");
   }
 
   return elements[counter - 1];
@@ -82,7 +85,7 @@ void MiniStack<T>::pop()
 {
   if (empty())
   {
-    throw std::runtime_error("Stack underflow");
+    throw std::runtime_error("Stack underflow in `pop`");
   }
 
   --counter;

@@ -1,0 +1,30 @@
+Empty
+Expected: 1, Actual: 1
+Expected: 1, Actual: 1
+Expected: 0, Actual: 0
+Expected: 0, Actual: 0
+Push
+Expected: 0, Actual: 0
+Expected: 0, Actual: 0
+Expected: 1, Actual: 1
+Expected: 2, Actual: 2
+Top
+Expected: 10 Actual: 10
+Expected: 12 Actual: 12
+Pop
+Expected: 1, Actual: 1
+Expected: 0, Actual: 0
+Expected: 0, Actual: 0
+Expected: 1, Actual: 1
+Expected: 1, Actual: 1
+Expected: 0, Actual: 0
+10 : Stack overflow in `push`
+0 : Stack underflow in `pop`
+0 : Stack underflow in `top`
+miniStackTimed | PUSH Elapsed Time: 120200ns
+miniStackTimed | POP Elapsed Time: 95600ns
+stackTimed | PUSH Elapsed Time: 2435400ns
+stackTimed | POP Elapsed Time: 1454000ns
+
+C:\dev\repos\DataStructures\x64\Debug\CustomDataStructures.exe (process 23572) exited with code 0.
+Press any key to close this window . . .
