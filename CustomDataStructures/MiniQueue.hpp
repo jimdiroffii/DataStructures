@@ -6,7 +6,7 @@
  * The objective is to define a statically sized
  * queue, that models a full queue structure.
  * 
- * The queue is more complicated in that it requires 
+ * The queue is more complicated than a stack in that it requires 
  * a circular buffer management of the front and back
  * of the queue. As long as the queue elements_ are 
  * not maxed out, then the queue can wrap around the 
@@ -18,6 +18,7 @@
 #ifndef MINIQUEUE_HPP_
 #define MINIQUEUE_HPP_
 
+#include <algorithm> // copy, move
 #include <memory>    // unique_ptr, make_unique
 #include <stdexcept> // runtime_error
 
@@ -27,7 +28,7 @@ class MiniQueue
 private:
   constexpr static std::size_t kQueueSize{ 10 };
 
-  std::size_t length_;
+  std::size_t length_;    // total capacity or size of queue
   std::unique_ptr<T[]> elements_;
   
   std::size_t counter_;   // number of elements
@@ -35,20 +36,28 @@ private:
   std::size_t end_;       // index of last element + 1
 
 public:
-  // Default Constructor
+  /* Default Constructor */
   MiniQueue(std::size_t len = 0);
 
-  // Capacity
+  /* Capacity */
   bool empty() const noexcept;
   std::size_t size() const noexcept;
 
-  // Modifiers
+  /* Modifiers */
   void push(const T& t);
   void pop();
 
-  // Access
+  /* Access */
   T& front() const;
   T& back() const;
+
+  /* Copy */
+  MiniQueue(const MiniQueue& other);
+  MiniQueue& operator=(const MiniQueue& other);
+
+  /* Move */
+  MiniQueue(MiniQueue&& other) noexcept;
+  MiniQueue& operator=(MiniQueue&& other) noexcept;
 };
 
 /* if a length has been input, use that for sizing the queue */
@@ -140,6 +149,67 @@ void MiniQueue<T>::pop()
   }
 
   --counter_;
+}
+
+/* Copy constructor */
+template <typename T>
+MiniQueue<T>::MiniQueue(const MiniQueue& other) :
+  length_(other.length_),
+  elements_(std::make_unique<T[]>(other.length_)),
+  counter_(other.counter_),
+  begin_(other.begin_),
+  end_(other.end_)
+{
+  std::copy(&other.elements_[0], &other.elements_[other.length_], &elements_[0]);
+}
+
+/* Copy assignment operator */
+template <typename T>
+MiniQueue<T>& MiniQueue<T>::operator=(const MiniQueue& other)
+{
+  if (this != &other) {
+    elements_ = std::make_unique<T[]>(other.length_);
+    std::copy(&other.elements_[0], &other.elements_[other.length_], &elements_[0]);
+    length_ = other.length_;
+    counter_ = other.counter_;
+    begin_ = other.begin_;
+    end_ = other.end_;
+  }
+  return *this;
+}
+
+/* Move constructor */
+template <typename T>
+MiniQueue<T>::MiniQueue(MiniQueue&& other) noexcept :
+  length_(other.length_),
+  elements_(std::move(other.elements_)),
+  counter_(other.counter_),
+  begin_(other.begin_),
+  end_(other.end_)
+{
+  other.length_ = 0;
+  other.counter_ = 0;
+  other.begin_ = 0;
+  other.end_ = 0;
+}
+
+/* Move assignment operator */
+template <typename T>
+MiniQueue<T>& MiniQueue<T>::operator=(MiniQueue&& other) noexcept
+{
+  if (this != &other) {
+    length_ = other.length_;
+    elements_ = std::move(other.elements_);
+    counter_ = other.counter_;
+    begin_ = other.begin_;
+    end_ = other.end_;
+
+    other.length_ = 0;
+    other.counter_ = 0;
+    other.begin_ = 0;
+    other.end_ = 0;
+  }
+  return *this;
 }
 
 #endif // MINIQUEUE_HPP_

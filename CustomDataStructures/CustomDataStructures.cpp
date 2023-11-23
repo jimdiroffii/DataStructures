@@ -5,16 +5,25 @@
  * Driver code file | main
  */
 
+#pragma warning(disable : 26446) // ignore unchecked subscript
+
 #include "MiniStack.hpp"
 #include "MiniQueue.hpp"
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <chrono> // high_resolution_clock
 #include <stack>
 #include <queue>
 #include <cstdint>
 
-void stackTest();
+
+
+std::chrono::steady_clock::time_point startTimer();
+std::chrono::milliseconds endTimer(const std::chrono::steady_clock::time_point& time);
+
 void queueTest();
+void stackTest();
 
 void miniStackPushPops(const std::size_t iterations);
 void stackPushPops(const std::size_t iterations);
@@ -22,72 +31,112 @@ void stackPushPops(const std::size_t iterations);
 void miniQueuePushPops(const std::size_t iterations);
 void queuePushPops(const std::size_t iterations);
 
+
 int main()
 {
   {
     // stackTest();
-    //queueTest();
-  }
-  
-  constexpr std::size_t kIter{ 1000 };
-
-  {
-    std::chrono::nanoseconds elapsedTimeMiniStack{};
-    std::chrono::nanoseconds elapsedTimeStack{};
-
-    {
-      const auto startTime = std::chrono::high_resolution_clock::now();
-
-      miniStackPushPops(kIter);
-
-      const auto endTime = std::chrono::high_resolution_clock::now();
-      elapsedTimeMiniStack = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
-      std::cout << "miniStack | Elapsed Time: " << elapsedTimeMiniStack << '\n';
-    }
-
-    {
-      const auto startTime = std::chrono::high_resolution_clock::now();
-
-      stackPushPops(kIter);
-
-      const auto endTime = std::chrono::high_resolution_clock::now();
-      elapsedTimeStack = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
-      std::cout << "std::stack | Elapsed Time: " << elapsedTimeStack << '\n';
-    }
-
-    std::cout << "Difference: " << elapsedTimeStack - elapsedTimeMiniStack
-      << " | Ratio: " << elapsedTimeStack / elapsedTimeMiniStack << "\n\n";
+    // queueTest();
   }
 
   {
-    std::chrono::nanoseconds elapsedTimeMiniQueue{};
-    std::chrono::nanoseconds elapsedTimeQueue{};
+    /* Set number of iterations for comparisons */
+    constexpr std::size_t kIter{ 10000000 };
+    /* Set number of iterations for averages */
+    constexpr std::size_t kAvgIter{ 10 };
 
-    {
-      const auto startTime = std::chrono::high_resolution_clock::now();
+    std::size_t i = 0;
 
-      miniQueuePushPops(kIter);
+    std::chrono::milliseconds totalMiniStack{};
+    std::chrono::milliseconds totalStack{};
+    std::chrono::milliseconds totalMiniQueue{};
+    std::chrono::milliseconds totalQueue{};
 
-      const auto endTime = std::chrono::high_resolution_clock::now();
-      elapsedTimeMiniQueue = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
-      std::cout << "miniQueue | Elapsed Time: " << elapsedTimeMiniQueue << '\n';
+    std::cout << "Running comparisons for " << kIter 
+              << " elements\nAveraged over " << kAvgIter << " iterations\n\n";
+
+    while (i++ < kAvgIter) {
+      {
+        const auto startTime = startTimer();
+        miniStackPushPops(kIter);
+        std::chrono::milliseconds elapsed = endTimer(startTime);
+        totalMiniStack += elapsed;
+        //std::cout << "MiniStack: " << elapsed << '\n';
+      }
+
+      {
+        const auto startTime = startTimer();
+        stackPushPops(kIter);
+        std::chrono::milliseconds elapsed = endTimer(startTime);
+        totalStack += elapsed;
+        //std::cout << "Stack: " << elapsed << '\n';
+      }
+
+      {
+        const auto startTime = startTimer();
+        miniQueuePushPops(kIter);
+        std::chrono::milliseconds elapsed = endTimer(startTime);
+        totalMiniQueue += elapsed;
+        //std::cout << "MiniQueue: " << elapsed << '\n';
+      }
+
+      {
+        const auto startTime = startTimer();
+        queuePushPops(kIter);
+        std::chrono::milliseconds elapsed = endTimer(startTime);
+        totalQueue += elapsed;
+        //std::cout << "Queue: " << elapsed << '\n';
+      }
     }
+    /*
+    std::cout << "Average MiniStack Time: "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(totalMiniStack).count() / static_cast<double>(kAvgIter) << " milliseconds\n";
+    std::cout << "Average Stack Time: "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(totalStack).count() / static_cast<double>(kAvgIter) << " milliseconds\n";
+    std::cout << "Average MiniQueue Time: "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(totalMiniQueue).count() / static_cast<double>(kAvgIter) << " milliseconds\n";
+    std::cout << "Average Queue Time: "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(totalQueue).count() / static_cast<double>(kAvgIter) << " milliseconds\n";
+    */
+    double avgMiniStackTime = std::chrono::duration_cast<std::chrono::milliseconds>(totalMiniStack).count() / static_cast<double>(kAvgIter);
+    double avgStackTime = std::chrono::duration_cast<std::chrono::milliseconds>(totalStack).count() / static_cast<double>(kAvgIter);
+    double avgMiniQueueTime = std::chrono::duration_cast<std::chrono::milliseconds>(totalMiniQueue).count() / static_cast<double>(kAvgIter);
+    double avgQueueTime = std::chrono::duration_cast<std::chrono::milliseconds>(totalQueue).count() / static_cast<double>(kAvgIter);
 
-    {
-      const auto startTime = std::chrono::high_resolution_clock::now();
+    std::cout << "Average MiniStack Time: " << avgMiniStackTime << " milliseconds\n";
+    std::cout << "Average Stack Time: " << avgStackTime << " milliseconds\n";
+    std::cout << "Average MiniQueue Time: " << avgMiniQueueTime << " milliseconds\n";
+    std::cout << "Average Queue Time: " << avgQueueTime << " milliseconds\n";
 
-      queuePushPops(kIter);
 
-      const auto endTime = std::chrono::high_resolution_clock::now();
-      elapsedTimeQueue = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
-      std::cout << "std::queue | Elapsed Time: " << elapsedTimeQueue << '\n';
-    }
+    // Comparisons
+    double stackTimeDifference = avgStackTime - avgMiniStackTime;
+    double stackTimeRatio = avgStackTime / avgMiniStackTime;
+    std::cout << "Stack Time Difference (Standard - Custom): " << stackTimeDifference << " milliseconds\n";
+    std::cout << "Stack Time Ratio (Standard / Custom): " << stackTimeRatio << "\n";
 
-    std::cout << "Difference: " << elapsedTimeQueue - elapsedTimeMiniQueue
-      << " | Ratio: " << elapsedTimeQueue / elapsedTimeMiniQueue << "\n\n";
+    double queueTimeDifference = avgQueueTime - avgMiniQueueTime;
+    double queueTimeRatio = avgQueueTime / avgMiniQueueTime;
+    std::cout << "Queue Time Difference (Standard - Custom): " << queueTimeDifference << " milliseconds\n";
+    std::cout << "Queue Time Ratio (Standard / Custom): " << queueTimeRatio << "\n";
   }
+}
 
-  
+std::chrono::steady_clock::time_point startTimer() {
+  auto time = std::chrono::high_resolution_clock::now();
+  return time;
+}
+
+std::chrono::milliseconds endTimer(const std::chrono::steady_clock::time_point& time) {
+  const auto endTime = std::chrono::high_resolution_clock::now();
+  return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - time);
+  /*
+  const auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - time);
+
+  std::ostringstream oss{};
+  oss << "Elapsed Time: " << elapsedTime << '\n';
+  return oss.str();
+  */
 }
 
 void queueTest() {
@@ -160,7 +209,7 @@ void queueTest() {
   miniQueue_A.pop();
   miniQueue_A.push(127);
   std::cout << miniQueue_A.front() << ' ' << miniQueue_A.back() << '\n';
-  
+
   // Exception test
   int count{};
   MiniQueue<int> miniQueue_C{};
@@ -207,6 +256,40 @@ void queueTest() {
   {
     std::cout << count << " : " << e.what() << '\n';
   }
+
+  // Copy and Move Test
+  // Create a MiniQueue and populate it
+  MiniQueue<int> miniQueue_D;
+  for (int i = 0; i < 5; ++i) {
+    miniQueue_D.push(i);
+  }
+
+  // Test Copy Constructor
+  MiniQueue<int> miniQueue_E = miniQueue_D; // Using copy constructor
+  std::cout << "After Copy Constructor:\n";
+  std::cout << "Queue D front: " << miniQueue_D.front() << ", Queue D back: " << miniQueue_D.back() << '\n';
+  std::cout << "Queue E front: " << miniQueue_E.front() << ", Queue E back: " << miniQueue_E.back() << '\n';
+
+  // Test Copy Assignment
+  MiniQueue<int> miniQueue_F;
+  miniQueue_F = miniQueue_D; // Using copy assignment
+  std::cout << "After Copy Assignment:\n";
+  std::cout << "Queue D front: " << miniQueue_D.front() << ", Queue D back: " << miniQueue_D.back() << '\n';
+  std::cout << "Queue F front: " << miniQueue_F.front() << ", Queue F back: " << miniQueue_F.back() << '\n';
+
+  // Test Move Constructor
+  MiniQueue<int> miniQueue_G = std::move(miniQueue_E); // Using move constructor
+  std::cout << "After Move Constructor:\n";
+  // Note: miniQueue_E is in a valid but unspecified state now
+  std::cout << "Queue G front: " << miniQueue_G.front() << ", Queue G back: " << miniQueue_G.back() << '\n';
+
+  // Test Move Assignment
+  MiniQueue<int> miniQueue_H;
+  miniQueue_H = std::move(miniQueue_F); // Using move assignment
+  std::cout << "After Move Assignment:\n";
+  // Note: miniQueue_F is in a valid but unspecified state now
+  std::cout << "Queue H front: " << miniQueue_H.front() << ", Queue H back: " << miniQueue_H.back() << "\n\n";
+
 }
 
 void stackTest()
