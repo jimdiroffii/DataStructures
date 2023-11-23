@@ -8,7 +8,7 @@
  * 
  * The queue is more complicated in that it requires 
  * a circular buffer management of the front and back
- * of the queue. As long as the queue elements are 
+ * of the queue. As long as the queue elements_ are 
  * not maxed out, then the queue can wrap around the 
  * last index, and the queue moves in a windowed fashion.
  */
@@ -27,12 +27,12 @@ class MiniQueue
 private:
   constexpr static std::size_t kQueueSize{ 10 };
 
-  std::size_t length;
-  std::size_t counter;
-  std::unique_ptr<T[]> elements;
+  std::size_t length_;
+  std::unique_ptr<T[]> elements_;
   
-  std::size_t begin; // index of next element to leave queue
-  std::size_t end; // index of last element + 1
+  std::size_t counter_;   // number of elements
+  std::size_t begin_;     // index of next element to leave queue
+  std::size_t end_;       // index of last element + 1
 
 public:
   // Default Constructor
@@ -51,40 +51,42 @@ public:
   T& back() const;
 };
 
+/* if a length has been input, use that for sizing the queue */
 template <typename T>
-MiniQueue<T>::MiniQueue(std::size_t len) : length{ len > 0 ? len : kQueueSize },
-counter{ 0 },
-elements{ std::make_unique<T[]>(this->length) },
-begin{ 0 },
-end{ 0 } {}
+MiniQueue<T>::MiniQueue(std::size_t length) : 
+  length_{ length > 0 ? length : kQueueSize },
+  elements_{ std::make_unique<T[]>(this->length_) },
+  counter_{ 0 },
+  begin_{ 0 },
+  end_{ 0 } {}
 
 template <typename T>
 bool MiniQueue<T>::empty() const noexcept
 {
-  return (counter == 0);
+  return (counter_ == 0);
 }
 
 template <typename T>
 std::size_t MiniQueue<T>::size() const noexcept
 {
-  return counter;
+  return counter_;
 }
 
 template <typename T>
 void MiniQueue<T>::push(const T& t)
 {
-  if (counter >= length)
+  if (counter_ >= length_)
   {
     throw std::runtime_error("Queue overflow in `push`");
   }
   
-  // loop back around to the start of the queue after reaching the end
-  if (end >= length) {
-    end = 0;
+  /* loop back around to the start of the queue after reaching the end */
+  if (end_ >= length_) {
+    end_ = 0;
   }
 
-  elements[end++] = t;
-  ++counter;
+  elements_[end_++] = t;
+  ++counter_;
 }
 
 template <typename T>
@@ -95,7 +97,7 @@ T& MiniQueue<T>::front() const
     throw std::runtime_error("Queue underflow in `front`");
   }
 
-  return elements[begin];
+  return elements_[begin_];
 }
 
 template <typename T>
@@ -106,13 +108,13 @@ T& MiniQueue<T>::back() const
     throw std::runtime_error("Queue underflow in `back`");
   }
 
-  // if the last element is at the end of the structure, wrap the
-  // index access to the end of the structure
-  if (end - 1 < 0) {
-    return elements[length - 1];
+  /* if the last element is at the end of the structure, wrap the
+     index access to the end of the structure */
+  if (end_ == 0) {
+    return elements_[length_ - 1];
   }
 
-  return elements[end - 1];
+  return elements_[end_ - 1];
 }
 
 template <typename T>
@@ -123,21 +125,21 @@ void MiniQueue<T>::pop()
     throw std::runtime_error("Queue underflow in `pop`");
   }
 
-  // there is only a single element left, reset the queue
-  if ((begin + 1 == end) || (begin + 1 >= length && end == 0)) {
-    counter = begin = end = 0;
+  /* there is only a single element left, reset the queue */
+  if ((begin_ + 1 == end_) || (begin_ + 1 >= length_ && end_ == 0)) {
+    counter_ = begin_ = end_ = 0;
     return;
   }
 
-  // wrap begin back around to the beginning
-  if (begin + 1 >= length) {
-    begin = 0;
+  /* wrap begin back around to the beginning */
+  if (begin_ + 1 >= length_) {
+    begin_ = 0;
   }
   else {
-    begin += 1;
+    begin_ += 1;
   }
 
-  --counter;
+  --counter_;
 }
 
 #endif // MINIQUEUE_HPP_
