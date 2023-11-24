@@ -17,8 +17,6 @@
 #include <queue>
 #include <cstdint>
 
-
-
 std::chrono::steady_clock::time_point startTimer();
 std::chrono::milliseconds endTimer(const std::chrono::steady_clock::time_point& time);
 
@@ -30,7 +28,6 @@ void stackPushPops(const std::size_t iterations);
 
 void miniQueuePushPops(const std::size_t iterations);
 void queuePushPops(const std::size_t iterations);
-
 
 int main()
 {

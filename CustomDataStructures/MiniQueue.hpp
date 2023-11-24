@@ -8,7 +8,7 @@
  * 
  * The queue is more complicated than a stack in that it requires 
  * a circular buffer management of the front and back
- * of the queue. As long as the queue elements_ are 
+ * of the queue. As long as the queue elements are 
  * not maxed out, then the queue can wrap around the 
  * last index, and the queue moves in a windowed fashion.
  */
