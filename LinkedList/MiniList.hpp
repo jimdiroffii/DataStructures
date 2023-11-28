@@ -1,7 +1,7 @@
 /****
  *
  *
- * copy-and-swap idiom template
+ * copy-and-swap idiom template | Jack Lilhammers
  * https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
  */
 
@@ -44,8 +44,13 @@ public:
   std::size_t size() const noexcept;
   std::size_t max_size() const noexcept;
 
+  
   /* Swap for copy-and-swap idiom */
   friend void swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept {
+    // TODO: Implement swap() privately, and/or outside the class. This hack just 
+    // worked for now as-is and I got tired of messing with it. The copy and move
+    // semantics rely on it.
+
     using std::swap; // general solution for ensuring correct swap function
 
     swap(lhs.length_, rhs.length_);
@@ -91,8 +96,8 @@ public:
     }
   };
 
-  Iterator begin() const { return Iterator(head_); }
-  Iterator end() const { return Iterator(nullptr); }
+  Iterator begin() const noexcept { return Iterator(head_); }
+  Iterator end() const noexcept { return Iterator(nullptr); }
 };
 
 /* Default Constructor */
@@ -292,7 +297,7 @@ void MiniList<T>::pop_front()
   {
     ListNode<T>* newHead = head_->next;
     delete head_;
-    head_ = newHead;
+    head_ = newHead;                                        `
     --length_;
   }
 }
