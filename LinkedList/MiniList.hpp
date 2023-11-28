@@ -1,6 +1,6 @@
 /****
  *
- * 
+ *
  * copy-and-swap idiom template
  * https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
  */
@@ -30,9 +30,10 @@ private:
   ListNode<T>* head_;   // pointer to first node
   ListNode<T>* tail_;   // pointer to last node
 
+protected:
 public:
   /* Default Constructor */
-  MiniList();
+  MiniList() noexcept;
 
   /* Default Destructor */
   ~MiniList();
@@ -42,15 +43,15 @@ public:
   std::size_t size() const noexcept;
   std::size_t max_size() const noexcept;
 
-  /* Swap for copy-and-swap */
-  void swap(MiniList<T>& lhs, MiniList<T>& rhs);
+  /* Swap for copy-and-swap idiom */
+  void swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept;
 
   /* Copy Semantics */
-  MiniList(const MiniList<T>& other);
-  MiniList<T>& operator=(MiniList& other);
+  MiniList(const MiniList& other) noexcept;
+  MiniList<T>& operator=(const MiniList& other) noexcept;
 
   /* Move Semantics */
-  MiniList(MiniList&& other);
+  MiniList(MiniList&& other) noexcept;
 
   /* Access */
   T front() const;
@@ -61,11 +62,39 @@ public:
   void push_front(const T& t);
   void pop_back();
   void pop_front();
+
+  /* Iterators */
+  class Iterator
+  {
+  private:
+    ListNode<T>* current;
+  public:
+    Iterator(ListNode<T>* node) noexcept : current(node) {}
+
+    T& operator*() const noexcept { return current->data; }
+    Iterator& operator++() noexcept { current = current->next; return *this; }
+    bool operator!=(const Iterator& other) const noexcept {
+      return current != other.current;
+    }
+  };
+
+  Iterator begin() const { return Iterator(head_); }
+  Iterator end() const { return Iterator(nullptr); }
 };
+
+/* Swap for copy-and-swap */
+template <typename T>
+void MiniList<T>::swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept {
+  using std::swap; // general solution for ensuring correct swap function
+
+  swap(lhs.length_, rhs.length_);
+  swap(lhs.head_, rhs.head_);
+  swap(lhs.tail_, rhs.tail_);
+}
 
 /* Default Constructor */
 template <typename T>
-MiniList<T>::MiniList() : length_(0), head_(nullptr), tail_(nullptr) {}
+MiniList<T>::MiniList() noexcept : length_(0), head_(nullptr), tail_(nullptr) {}
 
 /* Default Destructor */
 template <typename T>
@@ -78,19 +107,9 @@ MiniList<T>::~MiniList() {
   }
 }
 
-/* Swap for copy-and-swap */
-template <typename T>
-void MiniList<T>::swap(MiniList<T>& lhs, MiniList<T>& rhs) {
-  using std::swap; // general solution for ensuring correct swap function
-
-  swap(lhs.length_, rhs.length_);
-  swap(lhs.head_, rhs.head_);
-  swap(lhs.tail_, rhs.tail_);
-}
-
 /* Copy Semantics */
 template <typename T>
-MiniList<T>::MiniList(const MiniList<T>& other) : MiniList() {
+MiniList<T>::MiniList(const MiniList<T>& other) noexcept : MiniList() {
   ListNode<T>* current = other.head_;
   while (current != nullptr) {
     push_back(current->data);
@@ -99,14 +118,15 @@ MiniList<T>::MiniList(const MiniList<T>& other) : MiniList() {
 }
 
 template <typename T>
-MiniList<T>& MiniList<T>::operator=(MiniList<T>& other) {
-  swap(*this, other);
+MiniList<T>& MiniList<T>::operator=(const MiniList<T>& other) noexcept {
+  MiniList<T> tmp(other);
+  swap(*this, tmp);
   return *this;
 }
 
 /* Move Semantics */
 template <typename T>
-MiniList<T>::MiniList(MiniList&& other) : MiniList() {
+MiniList<T>::MiniList(MiniList&& other) noexcept : MiniList() {
   swap(*this, other);
 }
 
@@ -129,16 +149,16 @@ std::size_t MiniList<T>::max_size() const noexcept {
 /* Access */
 template <typename T>
 T MiniList<T>::front() const {
-  if (empty() || head_ == nullptr) {
-    return NULL;
+  if (empty()) {
+    throw std::runtime_error("front() attempted to access empty list");
   }
   return head_->data;
 }
 
 template <typename T>
 T MiniList<T>::back() const {
-  if (empty() || tail_ == nullptr) {
-    return NULL;
+  if (empty()) {
+    throw std::runtime_error("back() attempted to access empty list");
   }
   return tail_->data;
 }
@@ -181,7 +201,7 @@ void MiniList<T>::push_front(const T& t) {
     /* technically, this string concatenation can fail too... */
     throw std::runtime_error("push_front() could not allocate new node, error: " + std::string(e.what()));
   }
-  
+
   newNode->data = t;
 
   if (empty()) {
