@@ -16,21 +16,22 @@
 #include <string>
 
 template <typename T>
-struct ListNode
-{
-  ListNode<T>* next;
-  T data;
-};
-
-template <typename T>
 class MiniList
 {
 private:
+  template <typename T>
+  struct ListNode
+  {
+    ListNode<T>* next;
+    T data;
+  };
+
   constexpr static std::size_t kMaxSize{ 1000 }; // maximum number of list elements
 
   std::size_t length_; // number of active elements
   ListNode<T>* head_;  // pointer to first node
   ListNode<T>* tail_;  // pointer to last node
+
 
 public:
   /* Default Constructor */
@@ -46,6 +47,7 @@ public:
 
   
   /* Swap for copy-and-swap idiom */
+  /*
   friend void swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept {
     // TODO: Implement swap() privately, and/or outside the class. This just 
     // worked for now as-is and I got tired of messing with it. The copy and move
@@ -57,6 +59,7 @@ public:
     swap(lhs.head_, rhs.head_);
     swap(lhs.tail_, rhs.tail_);
   }
+  */
 
   /* Copy Semantics */
   MiniList(const MiniList<T>& other) noexcept;
@@ -74,8 +77,11 @@ public:
   void push_front(const T& t);
   void pop_back();
   void pop_front();
+  void swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept;
+  void clear() noexcept;
 
   /* Iterators */
+private:
   class Iterator
   {
   private:
@@ -96,6 +102,7 @@ public:
     }
   };
 
+public:
   Iterator begin() const noexcept { return Iterator(head_); }
   Iterator end() const noexcept { return Iterator(nullptr); }
 };
@@ -300,6 +307,31 @@ void MiniList<T>::pop_front()
     head_ = newHead;
     --length_;
   }
+}
+
+template <typename T>
+void MiniList<T>::swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept {
+  // TODO: Implement swap() privately, and/or outside the class. This just 
+  // worked for now as-is and I got tired of messing with it. The copy and move
+  // semantics rely on it.
+
+  using std::swap; // general solution for ensuring correct swap function
+
+  swap(lhs.length_, rhs.length_);
+  swap(lhs.head_, rhs.head_);
+  swap(lhs.tail_, rhs.tail_);
+}
+
+template <typename T>
+void MiniList<T>::clear() noexcept {
+  if (empty()) {
+    return;
+  }
+  while (!empty()) {
+    pop_front();
+  }
+  head_ = tail_ = nullptr;
+  length_ = 0;
 }
 
 #endif // MINILIST_HPP_
