@@ -9,11 +9,12 @@
 #ifndef MINILIST_HPP_
 #define MINILIST_HPP_
 
-#include <algorithm> // swap
+#include <utility> // swap
 #include <cstdlib>   // size_t
 #include <exception> // bad_alloc
 #include <stdexcept> // runtime_error
 #include <string>
+#include <compare>   // <=>
 
 template <typename T>
 class MiniList
@@ -45,11 +46,11 @@ public:
   std::size_t size() const noexcept;
   std::size_t max_size() const noexcept;
 
-  
+
   /* Swap for copy-and-swap idiom */
   /*
   friend void swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept {
-    // TODO: Implement swap() privately, and/or outside the class. This just 
+    // TODO: Implement swap() privately, and/or outside the class. This just
     // worked for now as-is and I got tired of messing with it. The copy and move
     // semantics rely on it.
 
@@ -80,6 +81,13 @@ public:
   void swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept;
   void clear() noexcept;
 
+  /* Operations */
+  void sort() noexcept;
+
+  /* Operators */
+  //template <typename T>
+  friend std::strong_ordering operator<=>(const MiniList<T> & lhs, const MiniList<T> & rhs) = default;
+
   /* Iterators */
 private:
   class Iterator
@@ -90,7 +98,11 @@ private:
   public:
     Iterator(ListNode<T>* node) noexcept : current(node) {}
 
-    T& operator*() const noexcept { return current->data; }
+    T& operator*() const noexcept
+    {
+      return current->data;
+    }
+
     Iterator& operator++() noexcept
     {
       current = current->next;
@@ -311,10 +323,6 @@ void MiniList<T>::pop_front()
 
 template <typename T>
 void MiniList<T>::swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept {
-  // TODO: Implement swap() privately, and/or outside the class. This just 
-  // worked for now as-is and I got tired of messing with it. The copy and move
-  // semantics rely on it.
-
   using std::swap; // general solution for ensuring correct swap function
 
   swap(lhs.length_, rhs.length_);
@@ -327,11 +335,9 @@ void MiniList<T>::clear() noexcept {
   if (empty()) {
     return;
   }
-  while (!empty()) {
+  do {
     pop_front();
-  }
-  head_ = tail_ = nullptr;
-  length_ = 0;
+  } while (!empty());
 }
 
 #endif // MINILIST_HPP_

@@ -140,5 +140,14 @@ void testMiniListCopyAndMoveSemantics()
   // Optionally, check the content of the list
   printList(moveAssignedList);
 
+  copiedList.clear();
+  assert(copiedList.empty());
+
+  assignedList.clear();
+  assert(assignedList.empty());
+
+  moveAssignedList.clear();
+  assert(moveAssignedList.empty());
+
   std::cout << "Copy and Move Semantics Tests Passed." << std::endl;
 }
