@@ -1,7 +1,15 @@
+/****
+ *
+ * 
+ * copy-and-swap idiom template
+ * https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
+ */
+
 #pragma once
 #ifndef MINILIST_HPP_
 #define MINILIST_HPP_
 
+#include <algorithm> // swap
 #include <cstdlib> // size_t
 #include <stdexcept> // runtime_error
 #include <string>
@@ -26,10 +34,23 @@ public:
   /* Default Constructor */
   MiniList();
 
+  /* Default Destructor */
+  ~MiniList();
+
   /* Capacity */
   bool empty() const noexcept;
   std::size_t size() const noexcept;
   std::size_t max_size() const noexcept;
+
+  /* Swap for copy-and-swap */
+  void swap(MiniList<T>& lhs, MiniList<T>& rhs);
+
+  /* Copy Semantics */
+  MiniList(const MiniList<T>& other);
+  MiniList<T>& operator=(MiniList& other);
+
+  /* Move Semantics */
+  MiniList(MiniList&& other);
 
   /* Access */
   T front() const;
@@ -45,6 +66,49 @@ public:
 /* Default Constructor */
 template <typename T>
 MiniList<T>::MiniList() : length_(0), head_(nullptr), tail_(nullptr) {}
+
+/* Default Destructor */
+template <typename T>
+MiniList<T>::~MiniList() {
+  ListNode<T>* current = head_;
+  while (current != nullptr) {
+    ListNode<T>* next = current->next;
+    delete current;
+    current = next;
+  }
+}
+
+/* Swap for copy-and-swap */
+template <typename T>
+void MiniList<T>::swap(MiniList<T>& lhs, MiniList<T>& rhs) {
+  using std::swap; // general solution for ensuring correct swap function
+
+  swap(lhs.length_, rhs.length_);
+  swap(lhs.head_, rhs.head_);
+  swap(lhs.tail_, rhs.tail_);
+}
+
+/* Copy Semantics */
+template <typename T>
+MiniList<T>::MiniList(const MiniList<T>& other) : MiniList() {
+  ListNode<T>* current = other.head_;
+  while (current != nullptr) {
+    push_back(current->data);
+    current = current->next;
+  }
+}
+
+template <typename T>
+MiniList<T>& MiniList<T>::operator=(MiniList<T>& other) {
+  swap(*this, other);
+  return *this;
+}
+
+/* Move Semantics */
+template <typename T>
+MiniList<T>::MiniList(MiniList&& other) : MiniList() {
+  swap(*this, other);
+}
 
 /* Capacity */
 template <typename T>
@@ -142,18 +206,19 @@ void MiniList<T>::pop_back() {
     throw std::runtime_error("pop_back attempted to work on empty list");
   }
 
-  // TODO: might need to handle destruction of underlying data before pop
   if (size() == 1) {
+    delete head_; // tail_ pointed here too
     head_ = tail_ = nullptr;
     length_ = 0;
   }
   else {
-    ListNode<T>* ptr = head_;
-    while (ptr->next != tail_) {
-      ptr = ptr->next;
+    ListNode<T>* newTail = head_;
+    while (newTail->next != tail_) {
+      newTail = newTail->next;
     }
-    tail_ = ptr;
-    ptr->next = nullptr;
+    delete tail_;
+    tail_ = newTail;
+    tail_->next = nullptr;
     --length_;
   }
 }
@@ -165,11 +230,14 @@ void MiniList<T>::pop_front() {
   }
 
   if (size() == 1) {
+    delete head_; // tail_ pointed here too
     head_ = tail_ = nullptr;
     length_ = 0;
   }
   else {
-    head_ = head_->next;
+    ListNode<T>* newHead = head_->next;
+    delete head_;
+    head_ = newHead;
     --length_;
   }
 }
