@@ -83,6 +83,7 @@ public:
 
   /* Operations */
   void sort() noexcept;
+  void unique() noexcept;
 
   /* Operators */
   friend std::strong_ordering operator<=>(const MiniList<T>& lhs, const MiniList<T>& rhs) {
@@ -121,6 +122,9 @@ private:
     bool operator!=(const Iterator& other) const noexcept
     {
       return current != other.current;
+    }
+    bool operator==(const Iterator& other) const noexcept {
+      return current == other.current;
     }
   };
 
@@ -350,62 +354,95 @@ void MiniList<T>::clear() noexcept {
   } while (!empty());
 }
 
+/***
+ * MergeSort for LinkedList
+ * Inspired by: Simon Tatham | https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
+ * 
+ */
 template <typename T>
 void MiniList<T>::sort() noexcept {
   if (empty() || head_ == tail_) {
     return; // List is empty or has only one element, no need to sort
   }
 
-  ListNode<T>* p;
-  ListNode<T>* q;
-  ListNode<T>* e;
-  std::size_t psize, qsize, k = 1;
-  bool done;
+  ListNode<T>* mergeStart{};
+  ListNode<T>* nextSublistStart{};
+  ListNode<T>* selectedNode{};
+  std::size_t currentSublistSize{};
+  std::size_t nextSublistSize{};
+  std::size_t mergeSize = 1;
+  bool done{};
 
   do {
-    p = head_;
+    mergeStart = head_;
     head_ = nullptr;
     tail_ = nullptr;
     done = true;
 
-    while (p) {
-      q = p;
-      psize = 0;
-      for (std::size_t i = 0; i < k && q; ++i) {
-        ++psize;
-        q = q->next;
+    while (mergeStart) {
+      nextSublistStart = mergeStart;
+      currentSublistSize = 0;
+      for (std::size_t i = 0; i < mergeSize && nextSublistStart; ++i) {
+        ++currentSublistSize;
+        nextSublistStart = nextSublistStart->next;
       }
 
-      qsize = k;
-      while (psize > 0 || (qsize > 0 && q)) {
-        if (psize == 0) {
-          e = q; q = q->next; --qsize;
+      nextSublistSize = mergeSize;
+      while (currentSublistSize > 0 || (nextSublistSize > 0 && nextSublistStart)) {
+        if (currentSublistSize == 0) {
+          selectedNode = nextSublistStart; nextSublistStart = nextSublistStart->next; --nextSublistSize;
         }
-        else if (qsize == 0 || !q) {
-          e = p; p = p->next; --psize;
+        else if (nextSublistSize == 0 || !nextSublistStart) {
+          selectedNode = mergeStart; mergeStart = mergeStart->next; --currentSublistSize;
         }
-        else if (p->data <= q->data) {
-          e = p; p = p->next; --psize;
+        else if (mergeStart->data <= nextSublistStart->data) {
+          selectedNode = mergeStart; mergeStart = mergeStart->next; --currentSublistSize;
         }
         else {
-          e = q; q = q->next; --qsize;
+          selectedNode = nextSublistStart; nextSublistStart = nextSublistStart->next; --nextSublistSize;
         }
 
         if (tail_) {
-          tail_->next = e;
+          tail_->next = selectedNode;
         }
         else {
-          head_ = e;
+          head_ = selectedNode;
         }
-        tail_ = e;
+        tail_ = selectedNode;
         tail_->next = nullptr;
       }
 
-      p = q;
-      done = done && q == nullptr;
+      mergeStart = nextSublistStart;
+      done = done && nextSublistStart == nullptr;
     }
-    k *= 2;
+    mergeSize *= 2;
   } while (!done);
+}
+
+/***
+ * unique() finds adjacent duplicate `data` values from `ListNode`.
+ * List must be sorted for unique() to work correctly.
+ */
+template <typename T>
+void MiniList<T>::unique() noexcept {
+  if (empty() || head_ == tail_) {
+    return;
+  }
+
+  ListNode<T>* current = head_;
+  while (current->next != nullptr) {
+    if (current->data == current->next->data) {
+      ListNode<T>* toDelete = current->next;
+      current->next = current->next->next;
+      delete toDelete;
+      if (current->next == nullptr) {
+        tail_ = current;
+      }
+    }
+    else {
+      current = current->next;
+    }
+  }
 }
 
 #endif // MINILIST_HPP_
