@@ -1,0 +1,40 @@
+MiniList Testing!
+empty: true
+size: 0
+max size: 1000
+
+Empty list
+front: front() attempted to access empty list
+
+push_front: 1
+front: 1
+back: 1
+push_front: 2
+front: 2
+back: 1
+push_back: 3
+front: 2
+back: 3
+push_back: 4
+front: 2
+back: 4
+
+pop_back:
+front: 2
+back: 3
+pop_front:
+front: 1
+back: 3
+pop_back:
+front: 1
+back: 1
+pop_front:
+back: back() attempted to access empty list
+1 2 3 4 5
+1 2 3 4 5
+1 2 3 4 5
+1 2 3 4 5
+Copy and Move Semantics Tests Passed.
+
+C:\dev\repos\DataStructures\x64\Release\LinkedList.exe (process 12816) exited with code 0.
+Press any key to close this window . . .
