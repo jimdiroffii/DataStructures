@@ -11,13 +11,14 @@
 
 #include <algorithm> // swap
 #include <cstdlib>   // size_t
+#include <exception> // bad_alloc
 #include <stdexcept> // runtime_error
 #include <string>
 
 template <typename T>
 struct ListNode
 {
-  ListNode<T> *next;
+  ListNode<T>* next;
   T data;
 };
 
@@ -25,13 +26,12 @@ template <typename T>
 class MiniList
 {
 private:
-  constexpr static std::size_t kMaxSize{1000}; // maximum number of list elements
+  constexpr static std::size_t kMaxSize{ 1000 }; // maximum number of list elements
 
   std::size_t length_; // number of active elements
-  ListNode<T> *head_;  // pointer to first node
-  ListNode<T> *tail_;  // pointer to last node
+  ListNode<T>* head_;  // pointer to first node
+  ListNode<T>* tail_;  // pointer to last node
 
-protected:
 public:
   /* Default Constructor */
   MiniList() noexcept;
@@ -45,22 +45,28 @@ public:
   std::size_t max_size() const noexcept;
 
   /* Swap for copy-and-swap idiom */
-  void swap(MiniList<T> &lhs, MiniList<T> &rhs) noexcept;
+  friend void swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept {
+    using std::swap; // general solution for ensuring correct swap function
+
+    swap(lhs.length_, rhs.length_);
+    swap(lhs.head_, rhs.head_);
+    swap(lhs.tail_, rhs.tail_);
+  }
 
   /* Copy Semantics */
-  MiniList(const MiniList &other) noexcept;
-  MiniList<T> &operator=(const MiniList &other) noexcept;
+  MiniList(const MiniList<T>& other) noexcept;
+  MiniList<T>& operator=(MiniList<T> other) noexcept;
 
   /* Move Semantics */
-  MiniList(MiniList &&other) noexcept;
+  MiniList(MiniList<T>&& other) noexcept;
 
   /* Access */
   T front() const;
   T back() const;
 
   /* Modifiers */
-  void push_back(const T &t);
-  void push_front(const T &t);
+  void push_back(const T& t);
+  void push_front(const T& t);
   void pop_back();
   void pop_front();
 
@@ -68,18 +74,18 @@ public:
   class Iterator
   {
   private:
-    ListNode<T> *current;
+    ListNode<T>* current;
 
   public:
-    Iterator(ListNode<T> *node) noexcept : current(node) {}
+    Iterator(ListNode<T>* node) noexcept : current(node) {}
 
-    T &operator*() const noexcept { return current->data; }
-    Iterator &operator++() noexcept
+    T& operator*() const noexcept { return current->data; }
+    Iterator& operator++() noexcept
     {
       current = current->next;
       return *this;
     }
-    bool operator!=(const Iterator &other) const noexcept
+    bool operator!=(const Iterator& other) const noexcept
     {
       return current != other.current;
     }
@@ -89,17 +95,6 @@ public:
   Iterator end() const { return Iterator(nullptr); }
 };
 
-/* Swap for copy-and-swap */
-template <typename T>
-void MiniList<T>::swap(MiniList<T> &lhs, MiniList<T> &rhs) noexcept
-{
-  using std::swap; // general solution for ensuring correct swap function
-
-  swap(lhs.length_, rhs.length_);
-  swap(lhs.head_, rhs.head_);
-  swap(lhs.tail_, rhs.tail_);
-}
-
 /* Default Constructor */
 template <typename T>
 MiniList<T>::MiniList() noexcept : length_(0), head_(nullptr), tail_(nullptr) {}
@@ -108,10 +103,10 @@ MiniList<T>::MiniList() noexcept : length_(0), head_(nullptr), tail_(nullptr) {}
 template <typename T>
 MiniList<T>::~MiniList()
 {
-  ListNode<T> *current = head_;
+  ListNode<T>* current = head_;
   while (current != nullptr)
   {
-    ListNode<T> *next = current->next;
+    ListNode<T>* next = current->next;
     delete current;
     current = next;
   }
@@ -119,9 +114,9 @@ MiniList<T>::~MiniList()
 
 /* Copy Semantics */
 template <typename T>
-MiniList<T>::MiniList(const MiniList<T> &other) noexcept : MiniList()
+MiniList<T>::MiniList(const MiniList<T>& other) noexcept : MiniList()
 {
-  ListNode<T> *current = other.head_;
+  ListNode<T>* current = other.head_;
   while (current != nullptr)
   {
     push_back(current->data);
@@ -130,16 +125,15 @@ MiniList<T>::MiniList(const MiniList<T> &other) noexcept : MiniList()
 }
 
 template <typename T>
-MiniList<T> &MiniList<T>::operator=(const MiniList<T> &other) noexcept
+MiniList<T>& MiniList<T>::operator=(MiniList<T> other) noexcept
 {
-  MiniList<T> tmp(other);
-  swap(*this, tmp);
+  swap(*this, other);
   return *this;
 }
 
 /* Move Semantics */
 template <typename T>
-MiniList<T>::MiniList(MiniList &&other) noexcept : MiniList()
+MiniList<T>::MiniList(MiniList<T>&& other) noexcept : MiniList<T>()
 {
   swap(*this, other);
 }
@@ -186,15 +180,15 @@ T MiniList<T>::back() const
 
 /* Modifiers */
 template <typename T>
-void MiniList<T>::push_back(const T &t)
+void MiniList<T>::push_back(const T& t)
 {
-  ListNode<T> *newNode;
+  ListNode<T>* newNode;
 
   try
   {
     newNode = new ListNode<T>;
   }
-  catch (const std::bad_alloc &e)
+  catch (const std::bad_alloc& e)
   {
     /* technically, this string concatenation can fail too... */
     throw std::runtime_error("insert() could not allocate new node, error: " + std::string(e.what()));
@@ -217,15 +211,15 @@ void MiniList<T>::push_back(const T &t)
 }
 
 template <typename T>
-void MiniList<T>::push_front(const T &t)
+void MiniList<T>::push_front(const T& t)
 {
-  ListNode<T> *newNode;
+  ListNode<T>* newNode;
 
   try
   {
     newNode = new ListNode<T>;
   }
-  catch (const std::bad_alloc &e)
+  catch (const std::bad_alloc& e)
   {
     /* technically, this string concatenation can fail too... */
     throw std::runtime_error("push_front() could not allocate new node, error: " + std::string(e.what()));
@@ -268,7 +262,7 @@ void MiniList<T>::pop_back()
   }
   else
   {
-    ListNode<T> *newTail = head_;
+    ListNode<T>* newTail = head_;
     while (newTail->next != tail_)
     {
       newTail = newTail->next;
@@ -296,7 +290,7 @@ void MiniList<T>::pop_front()
   }
   else
   {
-    ListNode<T> *newHead = head_->next;
+    ListNode<T>* newHead = head_->next;
     delete head_;
     head_ = newHead;
     --length_;
