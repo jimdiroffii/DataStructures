@@ -12,7 +12,7 @@
 /* Test functions */
 #include <cassert>
 template <typename T>
-void printList(const MiniList<T> &list);
+void printList(const MiniList<T>& list);
 void testMiniListCopyAndMoveSemantics();
 
 int main()
@@ -38,74 +38,50 @@ int main()
   /* Access & Modification */
   {
     std::cout << "\nEmpty list\n";
-    try
-    {
-      std::cout << "front: " << miniList.front() << '\n';
-      // std::cout << "back: " << miniList.back() << '\n';
-    }
-    catch (const std::runtime_error &e)
-    {
-      std::cout << e.what() << '\n';
-    }
+    printList(miniList);
 
     int a = 1;
     miniList.push_front(a);
 
     std::cout << "\npush_front: 1\n";
-    std::cout << "front: " << miniList.front() << '\n';
-    std::cout << "back: " << miniList.back() << '\n';
+    printList(miniList);
 
     int b = 2;
     miniList.push_front(b);
 
     std::cout << "push_front: 2\n";
-    std::cout << "front: " << miniList.front() << '\n';
-    std::cout << "back: " << miniList.back() << '\n';
+    printList(miniList);
 
     int c = 3;
     miniList.push_back(c);
 
     std::cout << "push_back: 3\n";
-    std::cout << "front: " << miniList.front() << '\n';
-    std::cout << "back: " << miniList.back() << '\n';
+    printList(miniList);
 
     int d = 4;
     miniList.push_back(d);
 
     std::cout << "push_back: 4\n";
-    std::cout << "front: " << miniList.front() << '\n';
-    std::cout << "back: " << miniList.back() << '\n';
+    printList(miniList);
 
     miniList.pop_back();
 
     std::cout << "\npop_back:\n";
-    std::cout << "front: " << miniList.front() << '\n';
-    std::cout << "back: " << miniList.back() << '\n';
+    printList(miniList);
 
     miniList.pop_front();
 
     std::cout << "pop_front:\n";
-    std::cout << "front: " << miniList.front() << '\n';
-    std::cout << "back: " << miniList.back() << '\n';
+    printList(miniList);
 
     miniList.pop_back();
 
     std::cout << "pop_back:\n";
-    std::cout << "front: " << miniList.front() << '\n';
-    std::cout << "back: " << miniList.back() << '\n';
-
-    miniList.pop_front();
+    printList(miniList);
 
     std::cout << "pop_front:\n";
-    try
-    {
-      // std::cout << "front: " << miniList.front() << '\n';
-      std::cout << "back: " << miniList.back() << '\n';
-    }
-    catch (const std::runtime_error &e)
-    {
-      std::cout << e.what() << '\n';
-    }
+    miniList.pop_front();
+    printList(miniList);
 
     testMiniListCopyAndMoveSemantics();
   }
@@ -117,7 +93,7 @@ int main()
 }
 
 template <typename T>
-void printList(const MiniList<T> &list)
+void printList(const MiniList<T>& list)
 {
   // Helper function to print list contents for debugging
   for (auto current = list.begin(); current != list.end(); ++current)
