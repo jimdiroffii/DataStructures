@@ -2,6 +2,7 @@
 #include "MiniList.hpp"
 #include <iostream> // cout
 #include <ios>      // boolalpha
+#include <compare>  // <=>
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -14,6 +15,9 @@
 template <typename T>
 void printList(const MiniList<T>& list);
 void testMiniListCopyAndMoveSemantics();
+
+template <typename T>
+void testMiniListComparison();
 
 int main()
 {
@@ -64,6 +68,10 @@ int main()
     std::cout << "push_back: 4\n";
     printList(miniList);
 
+    miniList.sort();
+
+    printList(miniList);
+
     miniList.pop_back();
 
     std::cout << "\npop_back:\n";
@@ -84,6 +92,7 @@ int main()
     printList(miniList);
 
     testMiniListCopyAndMoveSemantics();
+    testMiniListComparison<int>();
   }
 
 #ifdef _DEBUG
@@ -150,4 +159,54 @@ void testMiniListCopyAndMoveSemantics()
   assert(moveAssignedList.empty());
 
   std::cout << "Copy and Move Semantics Tests Passed." << std::endl;
+}
+
+template<typename T>
+void testMiniListComparison() {
+  // Test scenarios
+  MiniList<T> list1;
+  MiniList<T> list2;
+  MiniList<T> list3;
+
+  // Populate lists with some data
+  list1.push_back(1);
+  list1.push_back(2);
+  list1.push_back(3);
+
+  list2.push_back(1);
+  list2.push_back(2);
+  list2.push_back(3);
+
+  list3.push_back(4);
+  list3.push_back(5);
+  list3.push_back(6);
+
+  // Test for equality
+  assert((list1 <=> list2) == std::strong_ordering::equal);
+
+  // Test for less than
+  assert((list1 <=> list3) == std::strong_ordering::less);
+
+  // Test for greater than
+  assert((list3 <=> list1) == std::strong_ordering::greater);
+
+  // Test empty lists
+  MiniList<T> emptyList1;
+  MiniList<T> emptyList2;
+
+  assert((emptyList1 <=> emptyList2) == std::strong_ordering::equal);
+
+  // Test a list with different sizes
+  MiniList<T> list4;
+  list4.push_back(1);
+  list4.push_back(2);
+
+  assert((list1 <=> list4) == std::strong_ordering::greater);
+
+  printList(list1);
+  printList(list2);
+  printList(list3);
+  printList(list4);
+
+  std::cout << "Ordering Semantics Tests Passed." << std::endl;
 }

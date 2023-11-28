@@ -85,8 +85,18 @@ public:
   void sort() noexcept;
 
   /* Operators */
-  //template <typename T>
-  friend std::strong_ordering operator<=>(const MiniList<T> & lhs, const MiniList<T> & rhs) = default;
+  friend std::strong_ordering operator<=>(const MiniList<T>& lhs, const MiniList<T>& rhs) {
+    auto lhsIt = lhs.begin();
+    auto rhsIt = rhs.begin();
+    while (lhsIt != lhs.end() && rhsIt != rhs.end()) {
+      if (*lhsIt != *rhsIt) {
+        return *lhsIt <=> *rhsIt;
+      }
+      ++lhsIt;
+      ++rhsIt;
+    }
+    return lhs.size() <=> rhs.size();
+  }
 
   /* Iterators */
 private:
@@ -338,6 +348,64 @@ void MiniList<T>::clear() noexcept {
   do {
     pop_front();
   } while (!empty());
+}
+
+template <typename T>
+void MiniList<T>::sort() noexcept {
+  if (empty() || head_ == tail_) {
+    return; // List is empty or has only one element, no need to sort
+  }
+
+  ListNode<T>* p;
+  ListNode<T>* q;
+  ListNode<T>* e;
+  std::size_t psize, qsize, k = 1;
+  bool done;
+
+  do {
+    p = head_;
+    head_ = nullptr;
+    tail_ = nullptr;
+    done = true;
+
+    while (p) {
+      q = p;
+      psize = 0;
+      for (std::size_t i = 0; i < k && q; ++i) {
+        ++psize;
+        q = q->next;
+      }
+
+      qsize = k;
+      while (psize > 0 || (qsize > 0 && q)) {
+        if (psize == 0) {
+          e = q; q = q->next; --qsize;
+        }
+        else if (qsize == 0 || !q) {
+          e = p; p = p->next; --psize;
+        }
+        else if (p->data <= q->data) {
+          e = p; p = p->next; --psize;
+        }
+        else {
+          e = q; q = q->next; --qsize;
+        }
+
+        if (tail_) {
+          tail_->next = e;
+        }
+        else {
+          head_ = e;
+        }
+        tail_ = e;
+        tail_->next = nullptr;
+      }
+
+      p = q;
+      done = done && q == nullptr;
+    }
+    k *= 2;
+  } while (!done);
 }
 
 #endif // MINILIST_HPP_
