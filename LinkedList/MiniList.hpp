@@ -84,6 +84,7 @@ public:
   /* Operations */
   void sort() noexcept;
   void unique() noexcept;
+  MiniList<T> merge(const MiniList<T>& lhs, const MiniList<T>& rhs) noexcept;
 
   /* Operators */
   friend std::strong_ordering operator<=>(const MiniList<T>& lhs, const MiniList<T>& rhs) {
@@ -357,7 +358,6 @@ void MiniList<T>::clear() noexcept {
 /***
  * MergeSort for LinkedList
  * Inspired by: Simon Tatham | https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
- * 
  */
 template <typename T>
 void MiniList<T>::sort() noexcept {
@@ -422,6 +422,7 @@ void MiniList<T>::sort() noexcept {
 /***
  * unique() finds adjacent duplicate `data` values from `ListNode`.
  * List must be sorted for unique() to work correctly.
+ * TODO: Random access unique() function for unsorted lists.
  */
 template <typename T>
 void MiniList<T>::unique() noexcept {
@@ -443,6 +444,41 @@ void MiniList<T>::unique() noexcept {
       current = current->next;
     }
   }
+}
+
+/***
+ * Merge Sorted Lists
+ * 
+ * Lists must be sorted prior to merging. It is not necessary to have unique values.
+ * TODO: Verify sorted lists before merge.
+ * TODO: Merge unsorted lists.
+ */
+template <typename T>
+MiniList<T> MiniList<T>::merge(const MiniList<T>& lhs, const MiniList<T>& rhs) noexcept {
+  MiniList<T> mergedList{};
+  ListNode<T>* lhs_node = lhs.head_;
+  ListNode<T>* rhs_node = rhs.head_;
+
+  while (lhs_node != nullptr && rhs_node != nullptr) {
+    if (lhs_node->data < rhs_node->data) {
+      mergedList.push_back(lhs_node->data);
+      lhs_node = lhs_node->next;
+    }
+    else {
+      mergedList.push_back(rhs_node->data);
+      rhs_node = rhs_node->next;
+    }
+  }
+  while (lhs_node != nullptr) {
+    mergedList.push_back(lhs_node->data);
+    lhs_node = lhs_node->next;
+  }
+  while (rhs_node != nullptr) {
+    mergedList.push_back(rhs_node->data);
+    rhs_node = rhs_node->next;
+  }
+
+  return mergedList;
 }
 
 #endif // MINILIST_HPP_

@@ -21,6 +21,7 @@ void fillListFromVector(MiniList<T>& list, const std::vector<T>& vec);
 template <typename T>
 bool compareListWithVector(const MiniList<T>& list, const std::vector<T>& vec);
 void testSort();
+void testMergeSortedLists();
 
 
 template <typename T>
@@ -107,6 +108,7 @@ int main()
     testMiniListCopyAndMoveSemantics();
     testMiniListComparison<int>();
     testSort();
+    testMergeSortedLists();
   }
 
 #ifdef _DEBUG
@@ -282,4 +284,63 @@ void testSort() {
   assert(compareListWithVector(list, { 1, 1, 2, 3, 3 }));
 
   std::cout << "All sort tests passed." << std::endl;
+}
+
+void testMergeSortedLists() {
+  // Creating sample sorted lists
+  MiniList<int> list1;
+  list1.push_back(1);
+  list1.push_back(3);
+  list1.push_back(5);
+
+  MiniList<int> list2;
+  list2.push_back(2);
+  list2.push_back(4);
+  list2.push_back(6);
+
+  // Printing the initial lists
+  std::cout << "List 1: ";
+  printList(list1);
+  std::cout << "List 2: ";
+  printList(list2);
+
+  // Merging the lists
+  MiniList<int> mergedList{};
+  mergedList = mergedList.merge(list1, list2);
+
+  // Printing the merged list
+  std::cout << "Merged List: ";
+  printList(mergedList);
+
+  // Assertions to validate the merge
+  assert(mergedList.size() == 6); // Check if the merged list has the correct size
+
+  MiniList<int> list3;
+  list3.push_back(1);
+  list3.push_back(3);
+  list3.push_back(5);
+  list3.push_back(7);
+  list3.push_back(9);
+
+  MiniList<int> list4;
+  list4.push_back(2);
+  list4.push_back(4);
+  list4.push_back(6);
+
+  // Printing the initial lists
+  std::cout << "List 3: ";
+  printList(list3);
+  std::cout << "List 4: ";
+  printList(list4);
+
+  // Merging the lists
+  MiniList<int> mergedList2{};
+  mergedList2 = mergedList2.merge(list3, list4);
+
+  // Printing the merged list
+  std::cout << "Merged List: ";
+  printList(mergedList2);
+
+  // Assertions to validate the merge
+  assert(mergedList2.size() == 8); // Check if the merged list has the correct size
 }
