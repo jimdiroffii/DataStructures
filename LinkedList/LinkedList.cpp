@@ -9,6 +9,11 @@
 #include <crtdbg.h>
 #endif
 
+/* Test functions */
+#include <cassert>
+template <typename T>
+void printList(const MiniList<T>& list);
+void testMiniListCopyAndMoveSemantics();
 
 int main()
 {
@@ -33,8 +38,15 @@ int main()
   /* Access & Modification */
   {
     std::cout << "\nEmpty list\n";
-    std::cout << "front: " << miniList.front() << '\n';
-    std::cout << "back: " << miniList.back() << '\n';
+    try
+    {
+      std::cout << "front: " << miniList.front() << '\n';
+      //std::cout << "back: " << miniList.back() << '\n';
+    }
+    catch (const std::runtime_error &e)
+    {
+      std::cout << e.what() << '\n';
+    }
 
     int a = 1;
     miniList.push_front(a);
@@ -85,9 +97,17 @@ int main()
     miniList.pop_front();
 
     std::cout << "pop_front:\n";
-    std::cout << "front: " << miniList.front() << '\n';
-    std::cout << "back: " << miniList.back() << '\n';
+    try
+    {
+      //std::cout << "front: " << miniList.front() << '\n';
+      std::cout << "back: " << miniList.back() << '\n';
+    }
+    catch (const std::runtime_error& e)
+    {
+      std::cout << e.what() << '\n';
+    }
 
+    testMiniListCopyAndMoveSemantics();
   }
 
 #ifdef _DEBUG
@@ -95,4 +115,51 @@ int main()
   _CrtDumpMemoryLeaks();
 #endif
 
+}
+
+template <typename T>
+void printList(const MiniList<T>& list) {
+  // Helper function to print list contents for debugging
+  for (auto current = list.begin(); current != list.end(); ++current) {
+    std::cout << *current << " ";
+  }
+  std::cout << std::endl;
+}
+
+void testMiniListCopyAndMoveSemantics() {
+  // Create a list and populate it
+  MiniList<int> originalList;
+  for (int i = 1; i <= 5; ++i) {
+    originalList.push_back(i);
+  }
+
+  // Copy constructor test
+  MiniList<int> copiedList(originalList);
+  assert(copiedList.size() == originalList.size()); // Sizes should be equal
+  // Optionally, check the content of the list
+  printList(copiedList);
+
+  // Copy assignment test
+  MiniList<int> assignedList;
+  assignedList = originalList;
+  assert(assignedList.size() == originalList.size()); // Sizes should be equal
+  // Optionally, check the content of the list
+  printList(assignedList);
+
+  // Move constructor test
+  MiniList<int> movedList(std::move(originalList));
+  assert(movedList.size() == 5); // Moved list should have original size
+  assert(originalList.empty()); // Original list should be empty after move
+  // Optionally, check the content of the list
+  printList(movedList);
+
+  // Move assignment test
+  MiniList<int> moveAssignedList;
+  moveAssignedList = std::move(movedList);
+  assert(moveAssignedList.size() == 5); // List should have size 5 after move
+  assert(movedList.empty()); // Moved-from list should be empty
+  // Optionally, check the content of the list
+  printList(moveAssignedList);
+
+  std::cout << "Copy and Move Semantics Tests Passed." << std::endl;
 }
