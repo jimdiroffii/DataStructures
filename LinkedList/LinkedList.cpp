@@ -3,6 +3,7 @@
 #include <iostream> // cout
 #include <ios>      // boolalpha
 #include <compare>  // <=>
+#include <vector>
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -15,6 +16,12 @@
 template <typename T>
 void printList(const MiniList<T>& list);
 void testMiniListCopyAndMoveSemantics();
+template <typename T>
+void fillListFromVector(MiniList<T>& list, const std::vector<T>& vec);
+template <typename T>
+bool compareListWithVector(const MiniList<T>& list, const std::vector<T>& vec);
+void testSort();
+
 
 template <typename T>
 void testMiniListComparison();
@@ -46,8 +53,14 @@ int main()
 
     int a = 1;
     miniList.push_front(a);
+    miniList.push_front(a);
+    miniList.push_front(a);
 
-    std::cout << "\npush_front: 1\n";
+    std::cout << "\npush_front x3: 1\n";
+    printList(miniList);
+
+    miniList.unique();
+
     printList(miniList);
 
     int b = 2;
@@ -93,6 +106,7 @@ int main()
 
     testMiniListCopyAndMoveSemantics();
     testMiniListComparison<int>();
+    testSort();
   }
 
 #ifdef _DEBUG
@@ -209,4 +223,63 @@ void testMiniListComparison() {
   printList(list4);
 
   std::cout << "Ordering Semantics Tests Passed." << std::endl;
+}
+
+// Helper function to fill a MiniList from a vector
+template <typename T>
+void fillListFromVector(MiniList<T>& list, const std::vector<T>& vec) {
+  list.clear();
+  for (const auto& item : vec) {
+    list.push_back(item);
+  }
+}
+
+// Helper function to compare MiniList with a vector
+template <typename T>
+bool compareListWithVector(const MiniList<T>& list, const std::vector<T>& vec) {
+  auto it = list.begin();
+  for (const auto& item : vec) {
+    if (it == list.end() || *it != item) {
+      return false;
+    }
+    ++it;
+  }
+  return it == list.end();
+}
+
+void testSort() {
+  MiniList<int> list;
+
+  // Test sorting an empty list
+  list.sort();
+  assert(list.empty());
+
+  // Test sorting a list with one element
+  list.push_back(1);
+  list.sort();
+  assert(compareListWithVector(list, { 1 }));
+
+  // Test sorting a list with elements in reverse order
+  fillListFromVector(list, { 3, 2, 1 });
+  list.sort();
+  assert(compareListWithVector(list, { 1, 2, 3 }));
+
+  // Test sorting an already sorted list
+  fillListFromVector(list, { 1, 2, 3 });
+  list.sort();
+  assert(compareListWithVector(list, { 1, 2, 3 }));
+
+  // Test sorting a list with random elements
+  fillListFromVector(list, { 5, 1, 4, 3, 2 });
+  list.sort();
+  assert(compareListWithVector(list, { 1, 2, 3, 4, 5 }));
+
+  // Test sorting a list with duplicate elements
+  fillListFromVector(list, { 3, 1, 2, 3, 1 });
+  printList(list);
+  list.sort();
+  printList(list);
+  assert(compareListWithVector(list, { 1, 1, 2, 3, 3 }));
+
+  std::cout << "All sort tests passed." << std::endl;
 }
