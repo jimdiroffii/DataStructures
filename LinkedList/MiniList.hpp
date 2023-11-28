@@ -297,7 +297,7 @@ void MiniList<T>::pop_front()
   {
     ListNode<T>* newHead = head_->next;
     delete head_;
-    head_ = newHead;                                        `
+    head_ = newHead;
     --length_;
   }
 }
