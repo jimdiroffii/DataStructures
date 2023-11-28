@@ -47,7 +47,7 @@ public:
   
   /* Swap for copy-and-swap idiom */
   friend void swap(MiniList<T>& lhs, MiniList<T>& rhs) noexcept {
-    // TODO: Implement swap() privately, and/or outside the class. This hack just 
+    // TODO: Implement swap() privately, and/or outside the class. This just 
     // worked for now as-is and I got tired of messing with it. The copy and move
     // semantics rely on it.
 
