@@ -1,7 +1,7 @@
 
 #include "MiniList.hpp"
 #include <iostream> // cout
-#include <ios> // boolalpha
+#include <ios>      // boolalpha
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -12,7 +12,7 @@
 /* Test functions */
 #include <cassert>
 template <typename T>
-void printList(const MiniList<T>& list);
+void printList(const MiniList<T> &list);
 void testMiniListCopyAndMoveSemantics();
 
 int main()
@@ -41,7 +41,7 @@ int main()
     try
     {
       std::cout << "front: " << miniList.front() << '\n';
-      //std::cout << "back: " << miniList.back() << '\n';
+      // std::cout << "back: " << miniList.back() << '\n';
     }
     catch (const std::runtime_error &e)
     {
@@ -77,7 +77,7 @@ int main()
     std::cout << "back: " << miniList.back() << '\n';
 
     miniList.pop_back();
-    
+
     std::cout << "\npop_back:\n";
     std::cout << "front: " << miniList.front() << '\n';
     std::cout << "back: " << miniList.back() << '\n';
@@ -99,10 +99,10 @@ int main()
     std::cout << "pop_front:\n";
     try
     {
-      //std::cout << "front: " << miniList.front() << '\n';
+      // std::cout << "front: " << miniList.front() << '\n';
       std::cout << "back: " << miniList.back() << '\n';
     }
-    catch (const std::runtime_error& e)
+    catch (const std::runtime_error &e)
     {
       std::cout << e.what() << '\n';
     }
@@ -114,22 +114,25 @@ int main()
   // Report any memory leaks
   _CrtDumpMemoryLeaks();
 #endif
-
 }
 
 template <typename T>
-void printList(const MiniList<T>& list) {
+void printList(const MiniList<T> &list)
+{
   // Helper function to print list contents for debugging
-  for (auto current = list.begin(); current != list.end(); ++current) {
+  for (auto current = list.begin(); current != list.end(); ++current)
+  {
     std::cout << *current << " ";
   }
   std::cout << std::endl;
 }
 
-void testMiniListCopyAndMoveSemantics() {
+void testMiniListCopyAndMoveSemantics()
+{
   // Create a list and populate it
   MiniList<int> originalList;
-  for (int i = 1; i <= 5; ++i) {
+  for (int i = 1; i <= 5; ++i)
+  {
     originalList.push_back(i);
   }
 
@@ -149,7 +152,7 @@ void testMiniListCopyAndMoveSemantics() {
   // Move constructor test
   MiniList<int> movedList(std::move(originalList));
   assert(movedList.size() == 5); // Moved list should have original size
-  assert(originalList.empty()); // Original list should be empty after move
+  assert(originalList.empty());  // Original list should be empty after move
   // Optionally, check the content of the list
   printList(movedList);
 
@@ -157,7 +160,7 @@ void testMiniListCopyAndMoveSemantics() {
   MiniList<int> moveAssignedList;
   moveAssignedList = std::move(movedList);
   assert(moveAssignedList.size() == 5); // List should have size 5 after move
-  assert(movedList.empty()); // Moved-from list should be empty
+  assert(movedList.empty());            // Moved-from list should be empty
   // Optionally, check the content of the list
   printList(moveAssignedList);
 
