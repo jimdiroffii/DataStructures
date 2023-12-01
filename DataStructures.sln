@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CustomDataStructures", "Cus
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LinkedList", "LinkedList\LinkedList.vcxproj", "{D425BFFE-DAF7-495D-847D-37AEFFBD1A1C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hashing", "Hashing\Hashing.vcxproj", "{298E49BC-DB77-492B-9737-FE10C73DFB4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{D425BFFE-DAF7-495D-847D-37AEFFBD1A1C}.Release|x64.Build.0 = Release|x64
 		{D425BFFE-DAF7-495D-847D-37AEFFBD1A1C}.Release|x86.ActiveCfg = Release|Win32
 		{D425BFFE-DAF7-495D-847D-37AEFFBD1A1C}.Release|x86.Build.0 = Release|Win32
+		{298E49BC-DB77-492B-9737-FE10C73DFB4B}.Debug|x64.ActiveCfg = Debug|x64
+		{298E49BC-DB77-492B-9737-FE10C73DFB4B}.Debug|x64.Build.0 = Debug|x64
+		{298E49BC-DB77-492B-9737-FE10C73DFB4B}.Debug|x86.ActiveCfg = Debug|Win32
+		{298E49BC-DB77-492B-9737-FE10C73DFB4B}.Debug|x86.Build.0 = Debug|Win32
+		{298E49BC-DB77-492B-9737-FE10C73DFB4B}.Release|x64.ActiveCfg = Release|x64
+		{298E49BC-DB77-492B-9737-FE10C73DFB4B}.Release|x64.Build.0 = Release|x64
+		{298E49BC-DB77-492B-9737-FE10C73DFB4B}.Release|x86.ActiveCfg = Release|Win32
+		{298E49BC-DB77-492B-9737-FE10C73DFB4B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
